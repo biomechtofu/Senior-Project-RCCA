@@ -17,6 +17,13 @@ from matplotlib.backends.backend_qt4agg import (
     FigureCanvasQTAgg as FigureCanvas,
     NavigationToolbar2QT as NavigationToolbar)
 
+import numpy as np
+import random
+
+zline = np.array([1, 5, 10, 35, 1])
+xline = np.array([3, 5, 70, 20, 3])
+yline = np.array([2, 5, 20, 50, 2])
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -89,6 +96,8 @@ class Ui_MainWindow(object):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
         self.QuitButton.clicked.connect(QtWidgets.QApplication.exit)
+        self.RecordButton.clicked.connect(self.updateGraph)
+        self.Control.clicked.connect(self.controlSwitch)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -108,13 +117,32 @@ class Ui_MainWindow(object):
         self.mplvl.addWidget(self.canvas)
         self.canvas.draw()
 
+    def updateGraph(self):
+        global zline
+        global xline
+        global yline
+        
+        newzline = np.append(zline, np.array([random.randint(0,100)]), 0)
+        newxline = np.append(xline, np.array([random.randint(0,100)]), 0)
+        newyline = np.append(yline, np.array([random.randint(0,100)]), 0)
+        zline = newzline
+        xline = newxline
+        yline = newyline    
+        fig1.clf()
+        fig1.add_subplot(111, projection='3d').plot3D(xline, yline, zline, 'red')   
+        self.addmpl(fig1)
+
+    def controlSwitch(self):
+        _translate = QtCore.QCoreApplication.translate
+        if self.Control.text == "Arm Control":
+            self.Control.setText("Head Control")
+            self.DownButton.setText(_translate("Down", "Pan Down"))
+        elif self.Control.objectName == "Head Control":
+            self.Control.setText("Arm Control")
+            self.DownButton.setText(_translate("Pan Down", "Down"))
+
 if __name__ == "__main__":
     import sys
-    import numpy as np
-    
-    zline = np.array([1, 5, 10, 35, 1])
-    xline = np.array([3, 5, 70, 20, 3])
-    yline = np.array([2, 5, 20, 50, 2])
     
     fig1 = Figure(figsize=(5,4), dpi=300)
     fig1.add_subplot(111, projection='3d').plot3D(xline, yline, zline, 'red')
