@@ -134,12 +134,18 @@ class Ui_MainWindow(object):
 
     def controlSwitch(self):
         _translate = QtCore.QCoreApplication.translate
-        if self.Control.text == "Arm Control":
-            self.Control.setText("Head Control")
-            self.DownButton.setText(_translate("Down", "Pan Down"))
-        elif self.Control.objectName == "Head Control":
-            self.Control.setText("Arm Control")
-            self.DownButton.setText(_translate("Pan Down", "Down"))
+        if self.Control.text() == "Arm Control":
+            self.Control.setText(_translate("Arm Control", "Head Control"))
+            self.UpButton.setText(_translate("Up", "Tilt Up"))
+            self.DownButton.setText(_translate("Down", "Tilt Down"))
+            self.LeftButton.setText(_translate("Left", "Pan Left"))
+            self.RightButton.setText(_translate("Right", "Pan Right"))
+        elif self.Control.text() == "Head Control":
+            self.Control.setText(_translate("Head Control", "Arm Control"))
+            self.UpButton.setText(_translate("Tilt Up", "Up"))
+            self.DownButton.setText(_translate("Tilt Down", "Down"))
+            self.LeftButton.setText(_translate("Pan Left", "Left"))
+            self.RightButton.setText(_translate("Pan Right", "Right"))
 
 if __name__ == "__main__":
     import sys
