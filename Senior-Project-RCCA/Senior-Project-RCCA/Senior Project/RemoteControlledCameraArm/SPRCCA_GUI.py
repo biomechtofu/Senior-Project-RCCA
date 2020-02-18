@@ -19,6 +19,7 @@ from matplotlib.backends.backend_qt4agg import (
 
 import numpy as np
 import random
+import serial
 
 zline = np.array([1, 5, 10, 35, 1])
 xline = np.array([3, 5, 70, 20, 3])
@@ -149,6 +150,12 @@ class Ui_MainWindow(object):
 
 if __name__ == "__main__":
     import sys
+    
+    ser = serial.Serial(port="COM3", baudrate=9600, bytesize=8, timeout=2, stopbits=serial.STOPBITS_ONE)
+    x = ser.write(b'i')
+    y = ser.read()
+    print(y)
+    ser.close()
     
     fig1 = Figure(figsize=(5,4), dpi=300)
     fig1.add_subplot(111, projection='3d').plot3D(xline, yline, zline, 'red')
