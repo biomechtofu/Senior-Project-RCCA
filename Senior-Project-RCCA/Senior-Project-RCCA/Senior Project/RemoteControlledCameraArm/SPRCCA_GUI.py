@@ -20,10 +20,15 @@ from matplotlib.backends.backend_qt4agg import (
 import numpy as np
 import random
 import serial
+import threading
+import struct
 
 zline = np.array([1, 5, 10, 35, 1])
 xline = np.array([3, 5, 70, 20, 3])
 yline = np.array([2, 5, 20, 50, 2])
+
+
+ser = serial.Serial(port="COM3", baudrate=9600, bytesize=8, timeout=2, stopbits=serial.STOPBITS_ONE) #open a serial port
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -96,9 +101,14 @@ class Ui_MainWindow(object):
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         
-        self.QuitButton.clicked.connect(QtWidgets.QApplication.exit)
+        self.QuitButton.clicked.connect(self.quit)
         self.RecordButton.clicked.connect(self.updateGraph)
         self.Control.clicked.connect(self.controlSwitch)
+
+    def quit(self):
+        ser.close()
+        QtWidgets.QApplication.exit()
+        MainWindow.close()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -123,6 +133,7 @@ class Ui_MainWindow(object):
         global xline
         global yline
         
+        print(ser.write(b'R'))
         newzline = np.append(zline, np.array([random.randint(0,100)]), 0)
         newxline = np.append(xline, np.array([random.randint(0,100)]), 0)
         newyline = np.append(yline, np.array([random.randint(0,100)]), 0)
@@ -148,14 +159,18 @@ class Ui_MainWindow(object):
             self.LeftButton.setText(_translate("Pan Left", "Left"))
             self.RightButton.setText(_translate("Pan Right", "Right"))
 
+def read_com():
+    while True:
+        #print("test")
+        reading = ser.read()
+        print(reading)
+
 if __name__ == "__main__":
     import sys
     
-    ser = serial.Serial(port="COM3", baudrate=9600, bytesize=8, timeout=2, stopbits=serial.STOPBITS_ONE)
-    x = ser.write(b'i')
-    y = ser.read()
-    print(y)
-    ser.close()
+    thread = threading.Thread(target=read_com)
+    thread.start()
+    ser.write(b'i')
     
     fig1 = Figure(figsize=(5,4), dpi=300)
     fig1.add_subplot(111, projection='3d').plot3D(xline, yline, zline, 'red')
