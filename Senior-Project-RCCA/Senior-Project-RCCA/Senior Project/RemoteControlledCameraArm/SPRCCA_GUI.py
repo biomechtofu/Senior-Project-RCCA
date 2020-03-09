@@ -28,7 +28,7 @@ xline = np.array([3, 5, 70, 20, 3])
 yline = np.array([2, 5, 20, 50, 2])
 
 
-ser = serial.Serial(port="COM3", baudrate=9600, bytesize=8, timeout=2, stopbits=serial.STOPBITS_ONE) #open a serial port
+ser = serial.Serial(port="COM3", baudrate=115200, bytesize=8, timeout=2, stopbits=serial.STOPBITS_ONE) #open a serial port
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -133,7 +133,9 @@ class Ui_MainWindow(object):
         global xline
         global yline
         
-        print(ser.write(b'R'))
+        print(ser.write(0x0C))
+        for x in range (0,13):
+            print(ser.write(0x00))
         newzline = np.append(zline, np.array([random.randint(0,100)]), 0)
         newxline = np.append(xline, np.array([random.randint(0,100)]), 0)
         newyline = np.append(yline, np.array([random.randint(0,100)]), 0)
@@ -160,8 +162,7 @@ class Ui_MainWindow(object):
             self.RightButton.setText(_translate("Pan Right", "Right"))
 
 def read_com():
-    while True:
-        #print("test")
+   while True:
         reading = ser.read()
         print(reading)
 
