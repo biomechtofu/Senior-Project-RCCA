@@ -5,6 +5,7 @@ import QtQuick.Controls.Material 2.1
 Item {
     Scatter3D {
         id: scatter3D
+        objectName: "graph"
         anchors.fill: parent
         theme: mytheme
         shadowQuality: AbstractGraph3D.ShadowQualitySoftLow

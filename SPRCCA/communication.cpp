@@ -1,11 +1,23 @@
 #include "communication.h"
+#include "math.h"
+#include <QtDataVisualization/QAbstract3DSeries>
+#include <QQuickItem>
+#include <QQuickView>
+#include <QUrl>
+
+
+using namespace QtDataVisualization;
 
 const char *portName = "\\\\.\\COM3";
 
 SerialPort *MCU;
-int DataLength = 7;
+#define DataLength 7
 
-Communication::Communication()
+int tilt_pos;
+int pan_pos;
+int roll_pos;
+
+Communication::Communication(QObject * parent) : QAbstractListModel(parent)
 {
     MCU = new SerialPort(portName);
 }
@@ -123,15 +135,60 @@ void Communication::record()
 {
     const char InCmd[7] = {13,0,0,0,0,0,0};
     char read[DataLength];
+    int x_pos;
+    int y_pos;
+    int z_pos;
 
     if(MCU->isConnected()){
         MCU->writeSerialPort(&InCmd[0], DataLength);
         int has_Read = MCU->readSerialPort(read, DataLength);
         if(has_Read)
         {
+            tilt_pos = read[1] | (read[2] << 8);
+            pan_pos = read[3] | (read[4] << 8);
+            roll_pos = read[5] | (read[6] << 8);
 
+            x_pos = 1 * cos(tilt_pos/16 * 1.8);
+            y_pos = 1 * cos(pan_pos/16 * 1.8);
+            z_pos = 1 * sin(roll_pos/16 * 1.8);
+
+            qDebug() << "Xpos" << x_pos;
+            qDebug() << "Ypos" << y_pos;
+            qDebug() << "Zpos" << z_pos;
+
+            m_data.append(QVector3D(x_pos, y_pos, z_pos));
         }
     }
+}
+
+int Communication::rowCount(const QModelIndex &parent) const
+{
+    return m_data.count();
+}
+
+QVariant Communication::data(const QModelIndex &index, int role) const
+{
+    if(!index.isValid())
+        return QVariant();
+
+    QVector3D point = m_data[index.row()];
+
+    switch(role)
+    {
+        case Qt::UserRole + 1: return point.x(); break;
+        case Qt::UserRole + 2: return point.y(); break;
+        case Qt::UserRole + 3: return point.z(); break;
+    }
+    return QVariant();
+}
+
+QHash<int, QByteArray> Communication::roleNames() const
+{
+    QHash<int, QByteArray> roles;
+        roles[Qt::UserRole + 1] = "x";
+        roles[Qt::UserRole + 2] = "y";
+        roles[Qt::UserRole + 3] = "z";
+        return roles;
 }
 
 void Communication::replay()

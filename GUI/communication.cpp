@@ -3,7 +3,7 @@
 const char *portName = "\\\\.\\COM3";
 
 SerialPort *MCU;
-int DataLength = 7;
+#define DataLength 7
 
 Communication::Communication()
 {
@@ -16,6 +16,10 @@ void Communication::up()
 
     if(MCU->isConnected()){
         MCU->writeSerialPort(&InCmd[0], DataLength);
+    }
+    else
+    {
+        printf("No MCU connected");
     }
 }
 

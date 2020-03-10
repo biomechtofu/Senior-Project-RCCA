@@ -3,6 +3,7 @@ import QtQuick.Window 2.14
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.1
 import com.company.Communication 1.0
+import QtDataVisualization 1.3
 
 Window {
     id: window
@@ -16,16 +17,27 @@ Window {
         id: com
     }
 
-    Graph {
-        id: graph
-        x: 920
-        width: 1000
-        anchors.right: parent.right
-        anchors.rightMargin: 0
+    Scatter3D {
+        id: scatter3D
+        x: 923
+        width: 997
         anchors.top: parent.top
         anchors.topMargin: 0
+        anchors.right: parent.right
+        anchors.rightMargin: 0
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
+        theme: mytheme
+        shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
+        Scatter3DSeries {
+            ItemModelScatterDataProxy {
+                zPosRoleReplace: qsTr("")
+                itemModel: com
+                yPosRole: "y"
+                xPosRole: "x"
+                zPosRole: "z"
+            }
+        }
     }
 
     RoundButton {
@@ -34,7 +46,7 @@ Window {
         y: 10
         width: 300
         height: 120
-        text: qsTr("IN")
+        text: qsTr("In")
         autoRepeat: true
         font.family: "Helvetica"
         font.pointSize: 20
@@ -46,7 +58,7 @@ Window {
         }
 
         onClicked: {
-            console.log("IN")
+            console.log("In")
             com.in()
         }
 
@@ -69,7 +81,7 @@ Window {
         }
 
         onClicked: {
-            console.log("OUT")
+            console.log("Out")
             com.out()
         }
     }
@@ -91,9 +103,14 @@ Window {
         }
 
         onClicked: {
-            console.log("UP")
-            com.up()
-            color: Material.color(Material.BlueGrey)
+            if(switch1.checked) {
+                console.log("Up")
+                com.up()
+            }
+            else {
+                console.log("Tilt Up")
+                com.tiltup()
+            }
         }
 
 
@@ -116,9 +133,14 @@ Window {
         }
 
         onClicked: {
-            console.log("LEFT")
-            com.left()
-            color: Material.color(Material.BlueGrey)
+            if(switch1.checked) {
+                console.log("Left")
+                com.left()
+            }
+            else {
+                console.log("Pan Left")
+                com.panleft()
+            }
         }
     }
 
@@ -139,9 +161,14 @@ Window {
         }
 
         onClicked: {
-            console.log("RIGHT")
-            com.right()
-            color: Material.color(Material.BlueGrey)
+            if(switch1.checked){
+                console.log("Right")
+                com.right()
+            }
+            else {
+                console.log("Pan Right")
+                com.panright()
+            }
         }
     }
 
@@ -162,9 +189,14 @@ Window {
         }
 
         onClicked: {
-            console.log("DOWN")
-            com.down()
-            color: Material.color(Material.BlueGrey)
+            if(switch1.checked) {
+                console.log("Down")
+                com.down()
+            }
+            else {
+                console.log("Tilt Down")
+                com.tiltdown()
+            }
         }
     }
 
@@ -175,7 +207,6 @@ Window {
         width: 300
         height: 120
         text: qsTr("Record")
-        autoRepeat: true
         font.pointSize: 20
         font.family: "Helvetica"
 
@@ -185,8 +216,8 @@ Window {
         }
 
         onClicked: {
-            console.log("RECORD")
-            color: Material.color(Material.BlueGrey)
+            console.log("Record")
+            com.record()
         }
     }
 
@@ -207,7 +238,7 @@ Window {
         }
 
         onClicked: {
-            console.log("REPLAY")
+            console.log("Replay")
         }
     }
 
@@ -228,22 +259,33 @@ Window {
         onToggled: {
             if(switch1.checked){
                 switch1.text = 'Arm Control'
-                button.text = 'IN'
-                button1.text = 'OUT'
+                button.text = 'In'
+                button1.text = 'Out'
                 button2.text = 'Up'
-                button3.text = 'LEFT'
-                button4.text = 'RIGHT'
-                button5.text = 'DOWN'
+                button3.text = 'Left'
+                button4.text = 'Right'
+                button5.text = 'Down'
             }
             else {
                 switch1.text = 'Head Control'
-                button.text = 'ROLL LEFT'
-                button1.text = 'ROLL RIGHT'
-                button2.text = 'TILT UP'
-                button3.text = 'PAN LEFT'
-                button4.text = 'PAN RIGHT'
-                button5.text = 'TILT DOWN'
+                button.text = 'Roll Left'
+                button1.text = 'Roll Right'
+                button2.text = 'Tilt Up'
+                button3.text = 'Pan Left'
+                button4.text = 'Pan Right'
+                button5.text = 'Tilt Down'
             }
         }
     }
+
+    Theme3D {
+        id: mytheme
+        type: Q3DTheme.ThemeUserDefined
+        backgroundColor: Material.color(Material.LightBlue)
+        windowColor: Material.color(Material.Amber)
+        labelTextColor: "black"
+        labelBackgroundEnabled: false
+        labelBorderEnabled: false
+    }
+
 }
